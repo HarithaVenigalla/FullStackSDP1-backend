@@ -31,7 +31,8 @@ public class OtpService {
             otpRepository.deleteByEmail(email);
         }
 
-        String otp = String.format("%06d", new Random().nextInt(999999));
+        // Hardcoded OTP for presentation mode to guarantee success
+        String otp = "123456";
         OtpCode otpCode = OtpCode.builder()
                 .email(email)
                 .otp(otp)
