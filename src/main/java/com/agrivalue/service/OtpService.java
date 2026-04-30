@@ -40,7 +40,12 @@ public class OtpService {
                 .build();
 
         otpRepository.save(otpCode);
-        emailService.sendOtpEmail(email, otp);
+        try {
+            emailService.sendOtpEmail(email, otp);
+        } catch (Exception e) {
+            System.err.println("SMTP Email failed on Render. OTP for " + email + " is: " + otp);
+            // Swallow exception to prevent registration from crashing on free tier
+        }
     }
 
     public boolean validateOtp(String email, String otp) {
