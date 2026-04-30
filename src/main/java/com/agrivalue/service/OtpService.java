@@ -41,12 +41,13 @@ public class OtpService {
                 .build();
 
         otpRepository.save(otpCode);
-        try {
-            emailService.sendOtpEmail(email, otp);
-        } catch (Exception e) {
-            System.err.println("SMTP Email failed on Render. OTP for " + email + " is: " + otp);
-            // Swallow exception to prevent registration from crashing on free tier
-        }
+        // try {
+        //     emailService.sendOtpEmail(email, otp);
+        // } catch (Exception e) {
+        //     System.err.println("SMTP Email failed on Render. OTP for " + email + " is: " + otp);
+        //     // Swallow exception to prevent registration from crashing on free tier
+        // }
+        System.out.println("PRESENTATION MODE: Skipped actual email send to avoid Render TCP timeouts. OTP is: " + otp);
     }
 
     public boolean validateOtp(String email, String otp) {
