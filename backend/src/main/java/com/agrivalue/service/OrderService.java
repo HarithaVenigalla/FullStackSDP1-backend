@@ -71,6 +71,8 @@ public class OrderService {
                 .status(order.getStatus())
                 .paymentType(order.getPaymentType())
                 .buyerUsername(order.getBuyer().getUsername())
+                .farmerId(order.getProduct().getFarmer().getId())
+                .farmerUsername(order.getProduct().getFarmer().getUsername())
                 .orderDate(order.getOrderDate())
                 .build();
     }

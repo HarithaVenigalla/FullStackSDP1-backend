@@ -20,8 +20,46 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final OtpService otpService;
+
+    public void initiateRegistration(RegisterRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email already registered");
+        }
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new RuntimeException("Username already taken");
+        }
+        validatePassword(request.getPassword());
+        otpService.generateAndSendOtp(request.getEmail());
+    }
+
+    public AuthResponse verifyAndRegister(com.agrivalue.dto.OtpVerificationRequest request) {
+        if (!otpService.validateOtp(request.getEmail(), request.getOtp())) {
+            throw new RuntimeException("Invalid or expired OTP");
+        }
+
+        var user = User.builder()
+                .username(request.getUsername())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(request.getRole())
+                .build();
+        
+        userRepository.save(user);
+        otpService.deleteOtp(request.getEmail());
+
+        var jwtToken = jwtService.generateToken(user);
+        return AuthResponse.builder()
+                .token(jwtToken)
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .build();
+    }
 
     public AuthResponse register(RegisterRequest request) {
+        // Keeping original for backward compatibility or direct admin create
         validatePassword(request.getPassword());
         var user = User.builder()
                 .username(request.getUsername())
@@ -33,6 +71,7 @@ public class AuthService {
         var jwtToken = jwtService.generateToken(user);
         return AuthResponse.builder()
                 .token(jwtToken)
+                .id(user.getId())
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .role(user.getRole())
@@ -51,6 +90,7 @@ public class AuthService {
         var jwtToken = jwtService.generateToken(user);
         return AuthResponse.builder()
                 .token(jwtToken)
+                .id(user.getId())
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .role(user.getRole())
