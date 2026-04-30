@@ -21,5 +21,7 @@ public class OrderResponse {
     private String status;
     private String paymentType;
     private String buyerUsername;
+    private Long farmerId;
+    private String farmerUsername;
     private LocalDateTime orderDate;
 }
